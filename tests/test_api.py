@@ -1,6 +1,8 @@
 import uuid
 from decimal import Decimal
 
+import asyncio
+
 import pytest
 
 URL = "/api/v1/wallets"
@@ -84,3 +86,25 @@ async def test_invalid_operation_body_returns_422(client, wallet, body):
     response = await client.post(f"{URL}/{wallet.id}/operation", json=body)
 
     assert response.status_code == 422
+
+
+async def test_concurrent_operations_via_api(client, wallet):
+    url = f"{URL}/{wallet.id}/operation"
+    deposit = {"operation_type": "DEPOSIT", "amount": 10}
+    withdraw = {"operation_type": "WITHDRAW", "amount": 10}
+
+    responses = await asyncio.gather(
+        *[client.post(url, json=deposit) for _ in range(50)]
+    )
+    assert all(r.status_code == 200 for r in responses)
+
+    responses = await asyncio.gather(
+        *[client.post(url, json=withdraw) for _ in range(80)]
+    )
+    codes = [r.status_code for r in responses]
+
+    assert codes.count(200) == 50
+    assert codes.count(409) == 30
+
+    response = await client.get(f"{URL}/{wallet.id}")
+    assert Decimal(response.json()["balance"]) == 0
