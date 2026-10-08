@@ -1,13 +1,9 @@
-import enum
 import uuid
 from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
-
-class OperationType(str, enum.Enum):
-    DEPOSIT = "DEPOSIT"
-    WITHDRAW = "WITHDRAW"
+from app.enums import OperationType
 
 
 class OperationRequest(BaseModel):
