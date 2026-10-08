@@ -3,8 +3,10 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from httpx import ASGITransport, AsyncClient
 
-from app.database import Base
+from app.database import Base, get_session
+from app.main import app
 from app.config import settings
 from app.models import Wallet
 
@@ -42,3 +44,17 @@ async def wallet(session):
     wallet = await Wallet.create(session)
     await session.commit()
     return wallet
+
+
+@pytest.fixture
+async def client(session_maker):
+    async def override_get_session():
+        async with session_maker() as session:
+            yield session
+
+    app.dependency_overrides[get_session] = override_get_session
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        yield client
+    app.dependency_overrides.clear()
