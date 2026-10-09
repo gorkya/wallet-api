@@ -6,16 +6,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import services
 from app.database import get_session
-from app.schemas import OperationRequest, WalletResponse
 from app.exceptions import WalletNotFoundError
 from app.models import Wallet
+from app.schemas import OperationRequest, WalletResponse
 
 router = APIRouter(prefix="/api/v1/wallets", tags=["wallets"])
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
-@router.post("", response_model=WalletResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=WalletResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_wallet(session: SessionDep):
     wallet = await Wallet.create(session)
     await session.commit()

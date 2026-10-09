@@ -1,15 +1,14 @@
 import pytest
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from httpx import ASGITransport, AsyncClient
 
+from app.config import settings
 from app.database import Base, get_session
 from app.main import app
-from app.config import settings
 from app.models import Wallet
-
 
 TEST_DATABASE_URL = settings.test_database_url
 

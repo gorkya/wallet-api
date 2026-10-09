@@ -2,8 +2,8 @@ import uuid
 from decimal import Decimal
 
 from sqlalchemy import CheckConstraint, Numeric, update
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 from app.enums import OperationType
@@ -12,7 +12,9 @@ from app.enums import OperationType
 class Wallet(Base):
     __tablename__ = "wallets"
     __table_args__ = (
-        CheckConstraint("balance >= 0", name="ck_wallets_balance_non_negative"),
+        CheckConstraint(
+            "balance >= 0", name="ck_wallets_balance_non_negative"
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)

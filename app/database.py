@@ -10,7 +10,6 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
 
-
 T = TypeVar("T", bound="Base")
 
 engine = create_async_engine(settings.database_url)

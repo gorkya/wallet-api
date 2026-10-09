@@ -3,9 +3,9 @@ from decimal import Decimal
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Wallet
 from app.enums import OperationType
 from app.exceptions import InsufficientFundsError, WalletNotFoundError
+from app.models import Wallet
 
 
 async def change_balance(
